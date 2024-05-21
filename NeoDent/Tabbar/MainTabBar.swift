@@ -1,20 +1,38 @@
-//
-//  MainTabBar.swift
-//  NeoDent
-//
-//  Created by Назерке Адильханова on 20.05.2024.
-//
-
 import UIKit
 
-class MainTabBar: UIView {
+class MainTabBarController: UITabBarController {
 
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let homeVC = MainViewController()
+        homeVC.tabBarItem = UITabBarItem(title: "Главная", image: UIImage(systemName: "house.fill"), tag: 0)
+        
+        let appointmentVC = AppointmentViewController()
+        appointmentVC.tabBarItem = UITabBarItem(title: "Запись на прием", image: UIImage(systemName: "calendar"), tag: 1)
+        
+        let historyVC = HistoryViewController()
+        historyVC.tabBarItem = UITabBarItem(title: "История записей", image: UIImage(systemName: "clock.fill"), tag: 2)
+        
+        let profileVC = ProfileViewController()
+        profileVC.tabBarItem = UITabBarItem(title: "Профиль", image: UIImage(systemName: "person.circle.fill"), tag: 3)
+        
+        let tabBarList = [homeVC, appointmentVC, historyVC, profileVC]
+        
+        viewControllers = tabBarList.map {
+            UINavigationController(rootViewController: $0)
+        }
+        
+        customizeTabBarAppearance() 
     }
-    */
-
+    
+    private func customizeTabBarAppearance() {
+        if #available(iOS 13.0, *) {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = .systemBackground
+            tabBar.standardAppearance = appearance
+            tabBar.scrollEdgeAppearance = tabBar.standardAppearance
+        }
+    }
 }

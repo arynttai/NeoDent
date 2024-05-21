@@ -23,14 +23,13 @@ class VerificationViewModel {
     func verifyCode() {
         if enteredCode == "1234" {
             isErrorLabelHidden?(true)
-            // Handle successful verification
         } else {
             isErrorLabelHidden?(false)
         }
     }
     
     func resendCode() {
-        remainingTime = 60
+        remainingTime = 10
         startTimer()
         canResendCode?(false)
         timerUpdate?("Отправить код повторно через: \(formatTime(remainingTime))")

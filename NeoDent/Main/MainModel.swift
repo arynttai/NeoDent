@@ -1,20 +1,30 @@
-//
-//  MainModel.swift
-//  NeoDent
-//
-//  Created by Назерке Адильханова on 20.05.2024.
-//
+import Foundation
 
-import UIKit
+struct Image: Codable {
+    let id: Int
+    let file: String
+}
 
-class MainModel: UIView {
+struct Service: Codable {
+    let id: Int
+    let name: String
+    let image: Image
+}
 
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
-    }
-    */
+struct Specialization: Codable {
+    let id: Int
+    let name: String
+}
 
+struct Doctor: Codable {
+    let id: Int
+    let fullName: String
+    let specialization: Specialization
+    let workExperience: Int?
+    let rating: Double?
+    let workDays: String?
+    let startWorkTime: String
+    let endWorkTime: String
+    let image: Image
+    let isFavorite: Bool
 }
