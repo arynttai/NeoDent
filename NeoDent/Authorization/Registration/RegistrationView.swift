@@ -10,6 +10,12 @@ class RegistrationViewController: UIViewController {
         return scrollView
     }()
     
+    private lazy var contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private lazy var greetingLabel: UILabel = {
         let label = UILabel()
         label.text = "Регистрация ✍️"
@@ -25,6 +31,7 @@ class RegistrationViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
+    
     private lazy var firstNameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Введите ваше имя"
@@ -39,6 +46,7 @@ class RegistrationViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
+    
     private lazy var lastNameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Введите вашу фамилию"
@@ -53,8 +61,11 @@ class RegistrationViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
+    
     private lazy var usernameTextField: UITextField = {
-        let textField = createTextField(placeholder: "Укажите уникальный логин на латинице")
+        let textField = UITextField()
+        textField.placeholder = "Придумайте уникальный логин"
+        textField.borderStyle = .roundedRect
         return textField
     }()
     
@@ -65,8 +76,11 @@ class RegistrationViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
+    
     private lazy var emailTextField: UITextField = {
-        let textField = createTextField(placeholder: "Укажите почту в формате example@mail.ru")
+        let textField = UITextField()
+        textField.placeholder = "Укажите почту в формате example@mail.ru"
+        textField.borderStyle = .roundedRect
         return textField
     }()
     
@@ -77,7 +91,13 @@ class RegistrationViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
-    private lazy var phoneNumberTextField: UITextField = createTextField(placeholder: "Введите номер телефона")
+    
+    private lazy var phoneNumberTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "+7 ___ ___ __ __"
+        textField.borderStyle = .roundedRect
+        return textField
+    }()
     
     private lazy var passwordLabel: UILabel = {
         let label = UILabel()
@@ -86,12 +106,11 @@ class RegistrationViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
+    
     private lazy var passwordTextField: UITextField = {
-        let textField = createTextField(placeholder: "Пароль", isSecure: true)
-        textField.textContentType = .newPassword
-        textField.rightView = eyeButton(for: textField)
-        textField.rightViewMode = .always
-        textField.accessibilityLabel = "Пароль должен содержать в себе одну заглавную букву и одну цифру"
+        let textField = UITextField()
+        textField.placeholder = "Придумайте пароль"
+        textField.borderStyle = .roundedRect
         return textField
     }()
     
@@ -102,18 +121,18 @@ class RegistrationViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
+    
     private lazy var confirmPasswordTextField: UITextField = {
-        let textField = createTextField(placeholder: "Повторите пароль", isSecure: true)
-        textField.textContentType = .newPassword
-        textField.rightView = eyeButton(for: textField)
-        textField.rightViewMode = .always
+        let textField = UITextField()
+        textField.placeholder = "Повторите пароль"
+        textField.borderStyle = .roundedRect
         return textField
     }()
     
     private lazy var registerButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Далее", for: .normal)
-        button.backgroundColor = .gray
+        button.backgroundColor = .lightGray
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 10
         button.isEnabled = false
@@ -130,22 +149,19 @@ class RegistrationViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .white
         view.addSubview(scrollView)
-        scrollView.addSubview(greetingLabel)
-        scrollView.addSubview(firstNameLabel)
-        scrollView.addSubview(firstNameTextField)
-        scrollView.addSubview(lastNameLabel)
-        scrollView.addSubview(lastNameTextField)
-        scrollView.addSubview(usernameLabel)
-        scrollView.addSubview(usernameTextField)
-        scrollView.addSubview(emailLabel)
-        scrollView.addSubview(emailTextField)
-        scrollView.addSubview(phoneNumberLabel)
-        scrollView.addSubview(phoneNumberTextField)
-        scrollView.addSubview(passwordLabel)
-        scrollView.addSubview(passwordTextField)
-        scrollView.addSubview(confirmPasswordLabel)
-        scrollView.addSubview(confirmPasswordTextField)
-        scrollView.addSubview(registerButton)
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubviews([
+            greetingLabel,
+            firstNameLabel, firstNameTextField,
+            lastNameLabel, lastNameTextField,
+            usernameLabel, usernameTextField,
+            emailLabel, emailTextField,
+            phoneNumberLabel, phoneNumberTextField,
+            passwordLabel, passwordTextField,
+            confirmPasswordLabel, confirmPasswordTextField,
+            registerButton
+        ])
         
         setupConstraints()
         addTextFieldTargets()
@@ -154,6 +170,11 @@ class RegistrationViewController: UIViewController {
     private func setupConstraints() {
         scrollView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.edges.equalTo(scrollView)
+            make.width.equalTo(scrollView)
         }
         
         greetingLabel.snp.makeConstraints { make in
@@ -165,85 +186,85 @@ class RegistrationViewController: UIViewController {
         firstNameLabel.snp.makeConstraints { make in
             make.top.equalTo(greetingLabel.snp.bottom).offset(20)
             make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
         }
         
         firstNameTextField.snp.makeConstraints { make in
             make.top.equalTo(firstNameLabel.snp.bottom).offset(8)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
-            make.height.equalTo(44)
         }
         
         lastNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(firstNameTextField.snp.bottom).offset(16)
+            make.top.equalTo(firstNameTextField.snp.bottom).offset(20)
             make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
         }
         
         lastNameTextField.snp.makeConstraints { make in
             make.top.equalTo(lastNameLabel.snp.bottom).offset(8)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
-            make.height.equalTo(44)
         }
         
         usernameLabel.snp.makeConstraints { make in
-            make.top.equalTo(lastNameTextField.snp.bottom).offset(16)
+            make.top.equalTo(lastNameTextField.snp.bottom).offset(20)
             make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
         }
         
         usernameTextField.snp.makeConstraints { make in
             make.top.equalTo(usernameLabel.snp.bottom).offset(8)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
-            make.height.equalTo(44)
         }
         
         emailLabel.snp.makeConstraints { make in
-            make.top.equalTo(usernameTextField.snp.bottom).offset(16)
+            make.top.equalTo(usernameTextField.snp.bottom).offset(20)
             make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
         }
         
         emailTextField.snp.makeConstraints { make in
             make.top.equalTo(emailLabel.snp.bottom).offset(8)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
-            make.height.equalTo(44)
         }
         
         phoneNumberLabel.snp.makeConstraints { make in
-            make.top.equalTo(emailTextField.snp.bottom).offset(16)
+            make.top.equalTo(emailTextField.snp.bottom).offset(20)
             make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
         }
         
         phoneNumberTextField.snp.makeConstraints { make in
             make.top.equalTo(phoneNumberLabel.snp.bottom).offset(8)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
-            make.height.equalTo(44)
         }
         
         passwordLabel.snp.makeConstraints { make in
-            make.top.equalTo(phoneNumberTextField.snp.bottom).offset(16)
+            make.top.equalTo(phoneNumberTextField.snp.bottom).offset(20)
             make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
         }
         
         passwordTextField.snp.makeConstraints { make in
             make.top.equalTo(passwordLabel.snp.bottom).offset(8)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
-            make.height.equalTo(44)
         }
         
         confirmPasswordLabel.snp.makeConstraints { make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(16)
+            make.top.equalTo(passwordTextField.snp.bottom).offset(20)
             make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
         }
         
         confirmPasswordTextField.snp.makeConstraints { make in
             make.top.equalTo(confirmPasswordLabel.snp.bottom).offset(8)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
-            make.height.equalTo(44)
         }
         
         registerButton.snp.makeConstraints { make in
@@ -255,39 +276,10 @@ class RegistrationViewController: UIViewController {
         }
     }
     
-    private func createTextField(placeholder: String, isSecure: Bool = false) -> UITextField {
-        let textField = UITextField()
-        textField.placeholder = placeholder
-        textField.borderStyle = .roundedRect
-        textField.isSecureTextEntry = isSecure
-        textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        return textField
-    }
-    
-    private func eyeButton(for textField: UITextField) -> UIButton {
-        let button = UIButton(type: .custom)
-        button.setImage(UIImage(systemName: "eye.slash"), for: .normal)
-        button.setImage(UIImage(systemName: "eye"), for: .selected)
-        button.addTarget(self, action: #selector(togglePasswordVisibility(_:)), for: .touchUpInside)
-        button.tag = textField.tag
-        return button
-    }
-
-    @objc private func togglePasswordVisibility(_ sender: UIButton) {
-        sender.isSelected.toggle()
-        if let textField = sender.superview as? UITextField {
-            textField.isSecureTextEntry.toggle()
-        }
-    }
-    
     private func addTextFieldTargets() {
-        firstNameTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        lastNameTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        usernameTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        emailTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        phoneNumberTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        passwordTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        confirmPasswordTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        [firstNameTextField, lastNameTextField, usernameTextField, emailTextField, phoneNumberTextField, passwordTextField, confirmPasswordTextField].forEach { textField in
+            textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        }
     }
     
     @objc private func textFieldDidChange(_ textField: UITextField) {
@@ -312,7 +304,7 @@ class RegistrationViewController: UIViewController {
         viewModel.isFormValid = { [weak self] isValid in
             DispatchQueue.main.async {
                 self?.registerButton.isEnabled = isValid
-                self?.registerButton.backgroundColor = isValid ? .blue : .gray
+                self?.registerButton.backgroundColor = isValid ? .blue : .lightGray
             }
         }
         
@@ -350,8 +342,16 @@ class RegistrationViewController: UIViewController {
             }
         }
     }
-
+    
     @objc private func backTapped() {
         self.navigationController?.popViewController(animated: true)
+    }
+}
+
+extension UIView {
+    func addSubviews(_ views: [UIView]) {
+        for view in views {
+            addSubview(view)
+        }
     }
 }

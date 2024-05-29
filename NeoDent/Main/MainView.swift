@@ -1,184 +1,126 @@
 import UIKit
 import SnapKit
+import Alamofire
+import Kingfisher
 
 class MainViewController: UIViewController {
-
+    
     private var viewModel = MainViewModel()
     
-    private lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        return scrollView
-    }()
-    
-    private lazy var contentView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    private lazy var greetingLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Привет, Акмарал! 👋"
-        label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        return label
-    }()
-    
-    private lazy var clinicServicesLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Услуги клиники"
-        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        return label
-    }()
-    
-    private lazy var moreServicesButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Еще", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        return button
-    }()
-    
-    private lazy var servicesStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 16
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
-    private lazy var recommendedDoctorsLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Рекомендуемые докторы"
-        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        return label
-    }()
-    
-    private lazy var moreDoctorsButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Еще", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        return button
-    }()
-    
-    private lazy var doctorsStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 16
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
+    private var collectionView: UICollectionView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        bindViewModel()
-        viewModel.fetchData()
-    }
-    
-    private func setupUI() {
-        view.backgroundColor = .white
+        setupCollectionView()
+        setupNavigationBar()
         
-        view.addSubview(scrollView)
-        scrollView.addSubview(contentView)
-        
-        contentView.addSubview(greetingLabel)
-        contentView.addSubview(clinicServicesLabel)
-        contentView.addSubview(moreServicesButton)
-        contentView.addSubview(servicesStackView)
-        contentView.addSubview(recommendedDoctorsLabel)
-        contentView.addSubview(moreDoctorsButton)
-        contentView.addSubview(doctorsStackView)
-        
-        setupConstraints()
-    }
-    
-    private func setupConstraints() {
-        scrollView.snp.makeConstraints { make in
-            make.edges.equalTo(view.safeAreaLayoutGuide)
+        viewModel.fetchDoctors {
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
         }
-        
-        contentView.snp.makeConstraints { make in
+    }
+    
+    private func setupCollectionView() {
+        let layout = createCompositionalLayout()
+        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
+        collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewCell.identifier)
+        collectionView.register(DoctorCollectionViewCell.self, forCellWithReuseIdentifier: DoctorCollectionViewCell.identifier)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        view.addSubview(collectionView)
+        collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.width.equalToSuperview()
-        }
-        
-        greetingLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
-            make.left.equalToSuperview().offset(16)
-        }
-        
-        clinicServicesLabel.snp.makeConstraints { make in
-            make.top.equalTo(greetingLabel.snp.bottom).offset(16)
-            make.left.equalToSuperview().offset(16)
-        }
-        
-        moreServicesButton.snp.makeConstraints { make in
-            make.centerY.equalTo(clinicServicesLabel)
-            make.right.equalToSuperview().offset(-16)
-        }
-        
-        servicesStackView.snp.makeConstraints { make in
-            make.top.equalTo(clinicServicesLabel.snp.bottom).offset(16)
-            make.left.equalToSuperview().offset(16)
-            make.right.equalToSuperview().offset(-16)
-        }
-        
-        recommendedDoctorsLabel.snp.makeConstraints { make in
-            make.top.equalTo(servicesStackView.snp.bottom).offset(32)
-            make.left.equalToSuperview().offset(16)
-        }
-        
-        moreDoctorsButton.snp.makeConstraints { make in
-            make.centerY.equalTo(recommendedDoctorsLabel)
-            make.right.equalToSuperview().offset(-16)
-        }
-        
-        doctorsStackView.snp.makeConstraints { make in
-            make.top.equalTo(recommendedDoctorsLabel.snp.bottom).offset(16)
-            make.left.equalToSuperview().offset(16)
-            make.right.equalToSuperview().offset(-16)
-            make.bottom.equalToSuperview().offset(-16)
         }
     }
     
-    private func bindViewModel() {
-        viewModel.onServicesUpdate = { [weak self] in
-            guard let self = self else { return }
-            self.updateServices()
+    private func setupNavigationBar() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "heart.fill"), style: .plain, target: self, action: #selector(favoritesTapped))
+    }
+    
+    @objc private func favoritesTapped() {
+    }
+    
+    private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
+        return UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
+            if sectionIndex == 0 {
+                return self.createServicesSection()
+            } else if sectionIndex == 1 {
+                return self.createBannerSection()
+            } else {
+                return self.createDoctorsSection()
+            }
         }
+    }
+    
+    private func createServicesSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3), heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
-        viewModel.onDoctorsUpdate = { [weak self] in
-            guard let self = self else { return }
-            self.updateDoctors()
-        }
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.1), heightDimension: .absolute(130))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
-        viewModel.onError = { [weak self] error in
-            guard let self = self else { return }
-            self.showError(error)
+        let nestedGroupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(260))
+        let nestedGroup = NSCollectionLayoutGroup.vertical(layoutSize: nestedGroupSize, subitems: [group, group])
+        
+        let section = NSCollectionLayoutSection(group: nestedGroup)
+        section.interGroupSpacing = 10
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        
+        return section
+    }
+    
+    private func createBannerSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(150))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(150))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 10
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        
+        return section
+    }
+    
+    private func createDoctorsSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(150))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(160))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 10
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        
+        return section
+    }
+}
+
+extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 3
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if section == 0 {
+            return viewModel.services.count
+        } else {
+            return viewModel.doctors.count
         }
     }
     
-    private func updateServices() {
-        servicesStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        for service in viewModel.services {
-            let label = UILabel()
-            label.text = service.name
-            servicesStackView.addArrangedSubview(label)
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if indexPath.section == 0 {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewCell.identifier, for: indexPath) as! CollectionViewCell
+            cell.configure(with: viewModel.services[indexPath.row])
+            return cell
+        }  else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DoctorCollectionViewCell.identifier, for: indexPath) as! DoctorCollectionViewCell
+            cell.configure(with: viewModel.doctors[indexPath.row])
+            return cell
         }
-    }
-    
-    private func updateDoctors() {
-        doctorsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        for doctor in viewModel.doctors {
-            let label = UILabel()
-            label.text = "\(doctor.fullName) - \(doctor.specialization.name)"
-            doctorsStackView.addArrangedSubview(label)
-        }
-    }
-    
-    private func showError(_ error: String) {
-        let alert = UIAlertController(title: "Error", message: error, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
     }
 }

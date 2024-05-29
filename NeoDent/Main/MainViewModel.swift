@@ -2,46 +2,32 @@ import Foundation
 import Alamofire
 
 class MainViewModel {
+    var services: [Service] = [
+        Service(image: "filling"),
+        Service(image: "cleaning"),
+        Service(image: "crown"),
+        Service(image: "implantation"),
+        Service(image: "rootСanals"),
+        Service(image: "whitening")
+    ]
     
-    var services: [Service] = []
     var doctors: [Doctor] = []
     
-    var onServicesUpdate: (() -> Void)?
-    var onDoctorsUpdate: (() -> Void)?
-    var onError: ((String) -> Void)?
-    
-    func fetchData() {
-        let login = "Vortex"
-        let password = "CyberNova789"
-        let credentials = Data("\(login):\(password)".utf8).base64EncodedString()
+    func fetchDoctors(completion: @escaping () -> Void) {
+        let url = "https://neobook.online/neodent/doctors/"
         
-        let headers: HTTPHeaders = [
-            "Authorization": "Basic \(credentials)"
-        ]
-        
-        
-        AF.request("https://neobook.online/neodent/swagger/", headers: headers).responseData { [weak self] response in
+        AF.request(url).responseData { response in
             switch response.result {
             case .success(let data):
                 do {
-                    let decoder = JSONDecoder()
-                    let responseDict = try decoder.decode([String: [Service]].self, from: data)
-                    if let services = responseDict["services"] {
-                        self?.services = services
-                        self?.onServicesUpdate?()
-                    }
-                    let responseDictForDoctors = try decoder.decode([String: [Doctor]].self, from: data)
-                    if let doctors = responseDictForDoctors["doctors"] {
-                        self?.doctors = doctors
-                        self?.onDoctorsUpdate?()
-                    }
+                    let decodedResponse = try JSONDecoder().decode(DoctorsResponse.self, from: data)
+                    self.doctors = decodedResponse.list
+                    completion()
                 } catch {
-                    print("Error decoding JSON: \(error)")
-                    self?.onError?("Failed to parse data")
+                    print("Failed to decode doctors: \(error)")
                 }
             case .failure(let error):
-                print(error)
-                self?.onError?("Failed to fetch data")
+                print("Failed to fetch doctors: \(error)")
             }
         }
     }

@@ -22,17 +22,5 @@ class MainTabBarController: UITabBarController {
         viewControllers = tabBarList.map {
             UINavigationController(rootViewController: $0)
         }
-        
-        customizeTabBarAppearance() 
-    }
-    
-    private func customizeTabBarAppearance() {
-        if #available(iOS 13.0, *) {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = .systemBackground
-            tabBar.standardAppearance = appearance
-            tabBar.scrollEdgeAppearance = tabBar.standardAppearance
-        }
     }
 }
