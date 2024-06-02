@@ -1,21 +1,20 @@
 import Foundation
 
 struct Service {
-//    let name: String
     let image: String
 }
 
 struct Doctor: Codable {
     let id: Int
-    let fullName: String
-    let specialization: Specialization
-    let workExperience: Int
-    let rating: Double?
-    let workDays: [String]
-    let startWorkTime: String
-    let endWorkTime: String
-    let image: Image
-    let isFavorite: Bool
+    var fullName: String
+    var specialization: Specialization
+    var workExperience: Int
+    var rating: Double?
+    var workDays: [String]
+    var startWorkTime: String
+    var endWorkTime: String
+    var image: Image
+    var isFavorite: Bool
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -31,7 +30,7 @@ struct Doctor: Codable {
     }
 }
 
-struct Specialization: Codable {
+struct Specialization: Codable, Hashable {
     let id: Int
     let name: String
 }

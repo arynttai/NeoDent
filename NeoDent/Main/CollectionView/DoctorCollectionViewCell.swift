@@ -6,6 +6,8 @@ class DoctorCollectionViewCell: UICollectionViewCell {
     
     static let identifier = "DoctorCollectionViewCell"
     
+    var favoriteAction: (() -> Void)?
+    
     lazy var cardView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -64,6 +66,13 @@ class DoctorCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    lazy var favoriteButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.tintColor = .red
+        button.addTarget(self, action: #selector(favoriteButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -81,6 +90,7 @@ class DoctorCollectionViewCell: UICollectionViewCell {
         cardView.addSubview(experienceLabel)
         cardView.addSubview(ratingLabel)
         cardView.addSubview(workTimeLabel)
+        cardView.addSubview(favoriteButton)
         
         cardView.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(8)
@@ -94,7 +104,7 @@ class DoctorCollectionViewCell: UICollectionViewCell {
         nameLabel.snp.makeConstraints { make in
             make.top.equalTo(doctorImage.snp.top)
             make.leading.equalTo(doctorImage.snp.trailing).offset(8)
-            make.trailing.equalToSuperview().inset(8)
+            make.trailing.equalTo(favoriteButton.snp.leading).offset(-8)
         }
         
         specializationLabel.snp.makeConstraints { make in
@@ -117,13 +127,23 @@ class DoctorCollectionViewCell: UICollectionViewCell {
             make.leading.trailing.equalTo(nameLabel)
             make.bottom.equalToSuperview().inset(8)
         }
+        
+        favoriteButton.snp.makeConstraints { make in
+            make.centerY.equalTo(nameLabel)
+            make.trailing.equalToSuperview().inset(8)
+            make.width.height.equalTo(24)
+        }
+    }
+    
+    @objc private func favoriteButtonTapped() {
+        favoriteAction?()
     }
     
     func configure(with doctor: Doctor) {
         if let url = URL(string: doctor.image.file) {
             doctorImage.kf.setImage(with: url)
         } else {
-            doctorImage.image = UIImage(systemName: "person.fill") // Placeholder image
+            doctorImage.image = UIImage(systemName: "person.fill")
         }
         nameLabel.text = doctor.fullName
         specializationLabel.text = doctor.specialization.name
@@ -135,5 +155,7 @@ class DoctorCollectionViewCell: UICollectionViewCell {
         }
         let workDays = doctor.workDays.joined(separator: ", ")
         workTimeLabel.text = "Рабочие дни: \(workDays)\nВремя: \(doctor.startWorkTime) - \(doctor.endWorkTime)"
+        let favoriteImage = doctor.isFavorite ? "heart.fill" : "heart"
+        favoriteButton.setImage(UIImage(systemName: favoriteImage), for: .normal)
     }
 }

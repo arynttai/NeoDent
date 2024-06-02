@@ -15,6 +15,8 @@
 		6F67F0AD2C073D1E007E74CD /* DoctorsListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67F0AC2C073D1E007E74CD /* DoctorsListViewController.swift */; };
 		6F67F0AF2C073D2B007E74CD /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67F0AE2C073D2B007E74CD /* CalendarViewController.swift */; };
 		6F67F0B12C073D39007E74CD /* ConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67F0B02C073D39007E74CD /* ConfirmationViewController.swift */; };
+		6F67F0B72C0CDC63007E74CD /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67F0B62C0CDC63007E74CD /* FilterViewController.swift */; };
+		6F67F0BA2C0CEE66007E74CD /* DoctorDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67F0B92C0CEE66007E74CD /* DoctorDetailViewController.swift */; };
 		6F7F1D542BE91B5400DD67F1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7F1D532BE91B5400DD67F1 /* AppDelegate.swift */; };
 		6F7F1D5D2BE91B5700DD67F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F7F1D5C2BE91B5700DD67F1 /* Assets.xcassets */; };
 		6F7F1D602BE91B5700DD67F1 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 6F7F1D5F2BE91B5700DD67F1 /* Base */; };
@@ -33,7 +35,6 @@
 		6FC1B4832BF4E4DD0052A632 /* VerificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC1B4822BF4E4DD0052A632 /* VerificationViewModel.swift */; };
 		6FC1B4852BF4E4EB0052A632 /* VerificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC1B4842BF4E4EB0052A632 /* VerificationModel.swift */; };
 		6FC1B4FD2BF8FA690052A632 /* RegistrationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC1B4FC2BF8FA690052A632 /* RegistrationRequest.swift */; };
-		6FC1B4FF2BF8FB140052A632 /* LoginResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC1B4FE2BF8FB140052A632 /* LoginResponse.swift */; };
 		6FC1B5052BFB64240052A632 /* PasswordRecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC1B5042BFB64240052A632 /* PasswordRecoveryView.swift */; };
 		6FC1B5212BFBA8680052A632 /* PasswordRecoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC1B5202BFBA8680052A632 /* PasswordRecoveryViewModel.swift */; };
 		6FC1B5262BFBAB4B0052A632 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC1B5252BFBAB4B0052A632 /* MainView.swift */; };
@@ -54,6 +55,8 @@
 		6F67F0AC2C073D1E007E74CD /* DoctorsListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoctorsListViewController.swift; sourceTree = "<group>"; };
 		6F67F0AE2C073D2B007E74CD /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		6F67F0B02C073D39007E74CD /* ConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationViewController.swift; sourceTree = "<group>"; };
+		6F67F0B62C0CDC63007E74CD /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
+		6F67F0B92C0CEE66007E74CD /* DoctorDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoctorDetailViewController.swift; sourceTree = "<group>"; };
 		6F7F1D502BE91B5400DD67F1 /* NeoDent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NeoDent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F7F1D532BE91B5400DD67F1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6F7F1D5C2BE91B5700DD67F1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -69,7 +72,6 @@
 		6FC1B4822BF4E4DD0052A632 /* VerificationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationViewModel.swift; sourceTree = "<group>"; };
 		6FC1B4842BF4E4EB0052A632 /* VerificationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationModel.swift; sourceTree = "<group>"; };
 		6FC1B4FC2BF8FA690052A632 /* RegistrationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationRequest.swift; sourceTree = "<group>"; };
-		6FC1B4FE2BF8FB140052A632 /* LoginResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginResponse.swift; sourceTree = "<group>"; };
 		6FC1B5042BFB64240052A632 /* PasswordRecoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryView.swift; sourceTree = "<group>"; };
 		6FC1B5202BFBA8680052A632 /* PasswordRecoveryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryViewModel.swift; sourceTree = "<group>"; };
 		6FC1B5252BFBAB4B0052A632 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -102,6 +104,8 @@
 		6F67F0A62C073C51007E74CD /* DoctorsList */ = {
 			isa = PBXGroup;
 			children = (
+				6F67F0B82C0CEE47007E74CD /* DoctorDetailView */,
+				6F67F0B52C0CDC38007E74CD /* FilterView */,
 				6F67F0AC2C073D1E007E74CD /* DoctorsListViewController.swift */,
 			);
 			path = DoctorsList;
@@ -129,6 +133,22 @@
 				6F67F0B02C073D39007E74CD /* ConfirmationViewController.swift */,
 			);
 			path = Confirmation;
+			sourceTree = "<group>";
+		};
+		6F67F0B52C0CDC38007E74CD /* FilterView */ = {
+			isa = PBXGroup;
+			children = (
+				6F67F0B62C0CDC63007E74CD /* FilterViewController.swift */,
+			);
+			path = FilterView;
+			sourceTree = "<group>";
+		};
+		6F67F0B82C0CEE47007E74CD /* DoctorDetailView */ = {
+			isa = PBXGroup;
+			children = (
+				6F67F0B92C0CEE66007E74CD /* DoctorDetailViewController.swift */,
+			);
+			path = DoctorDetailView;
 			sourceTree = "<group>";
 		};
 		6F7F1D472BE91B5400DD67F1 = {
@@ -170,7 +190,6 @@
 				6F7F1D6B2BE9272B00DD67F1 /* LoginView.swift */,
 				6F7F1D6F2BE9372500DD67F1 /* LoginViewModel.swift */,
 				6F7F1D712BE9373700DD67F1 /* LoginModel.swift */,
-				6FC1B4FE2BF8FB140052A632 /* LoginResponse.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -378,7 +397,6 @@
 				6FC1B47A2BF4DA9A0052A632 /* RegistrationViewModel.swift in Sources */,
 				6F7F1D702BE9372500DD67F1 /* LoginViewModel.swift in Sources */,
 				6F6037FD2BFF24060056B5B6 /* CollectionViewCell.swift in Sources */,
-				6FC1B4FF2BF8FB140052A632 /* LoginResponse.swift in Sources */,
 				6FC1B47C2BF4DAAF0052A632 /* RegistrationModel.swift in Sources */,
 				6FC1B5212BFBA8680052A632 /* PasswordRecoveryViewModel.swift in Sources */,
 				6FC1B47E2BF4DABF0052A632 /* RegistrationView.swift in Sources */,
@@ -388,10 +406,12 @@
 				6FC1B5372BFBAF370052A632 /* MainTabBar.swift in Sources */,
 				6FC1B4832BF4E4DD0052A632 /* VerificationViewModel.swift in Sources */,
 				6F7F1D6C2BE9272B00DD67F1 /* LoginView.swift in Sources */,
+				6F67F0BA2C0CEE66007E74CD /* DoctorDetailViewController.swift in Sources */,
 				6F7F1D542BE91B5400DD67F1 /* AppDelegate.swift in Sources */,
 				6FC1B4FD2BF8FA690052A632 /* RegistrationRequest.swift in Sources */,
 				6F67F0AD2C073D1E007E74CD /* DoctorsListViewController.swift in Sources */,
 				6FC1B4852BF4E4EB0052A632 /* VerificationModel.swift in Sources */,
+				6F67F0B72C0CDC63007E74CD /* FilterViewController.swift in Sources */,
 				6FC1B5462BFD6D590052A632 /* DoctorCollectionViewCell.swift in Sources */,
 				6FC1B53A2BFBB1760052A632 /* MainViewModel.swift in Sources */,
 				6F67F0A42C072394007E74CD /* MoreDoctorsViewController.swift in Sources */,

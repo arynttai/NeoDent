@@ -1,5 +1,4 @@
 import UIKit
-import VKPinCodeView
 import SnapKit
 
 class LoginViewController: UIViewController {
@@ -65,12 +64,12 @@ class LoginViewController: UIViewController {
     }()
 
     private lazy var forgotPasswordButton: UIButton = {
-            let button = UIButton()
-            button.setTitle("Забыли пароль?", for: .normal)
-            button.setTitleColor(.blue, for: .normal)
-            button.addTarget(self, action: #selector(forgotPasswordTapped), for: .touchUpInside)
-            return button
-        }()
+        let button = UIButton()
+        button.setTitle("Забыли пароль?", for: .normal)
+        button.setTitleColor(.blue, for: .normal)
+        button.addTarget(self, action: #selector(forgotPasswordTapped), for: .touchUpInside)
+        return button
+    }()
 
     private lazy var loginButton: UIButton = {
         let button = UIButton()
@@ -100,12 +99,12 @@ class LoginViewController: UIViewController {
         return button
     }()
 
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
         setupConstraints()
+        setupBindings()
     }
 
     private func setupUI() {
@@ -120,7 +119,6 @@ class LoginViewController: UIViewController {
         view.addSubview(loginButton)
         view.addSubview(registerLabel)
         view.addSubview(registerButton)
-//        view.addSubview(pinView)
     }
 
     private func setupConstraints() {
@@ -184,6 +182,25 @@ class LoginViewController: UIViewController {
         }
     }
 
+    private func setupBindings() {
+        viewModel.onLoginSuccess = { [weak self] in
+            guard let self = self else { return }
+            self.errorLabel.isHidden = true
+            // Navigate to MainTabBarController or perform other actions
+            if let username = self.usernameTextField.text {
+                let mainTabBarController = MainTabBarController(username: username)
+                mainTabBarController.modalPresentationStyle = .fullScreen
+                self.navigationController?.setViewControllers([mainTabBarController], animated: true)
+            }
+        }
+        
+        viewModel.onLoginFailure = { [weak self] errorMessage in
+            guard let self = self else { return }
+            self.errorLabel.text = errorMessage
+            self.errorLabel.isHidden = false
+        }
+    }
+
     @objc private func togglePasswordVisibility() {
         passwordTextField.isSecureTextEntry.toggle()
         eyeButton.isSelected.toggle()
@@ -197,38 +214,17 @@ class LoginViewController: UIViewController {
             return
         }
 
-        viewModel.login(username: username, password: password) { [weak self] success, errorMessage in
-            guard let self = self else { return }
-            if success {
-                print("Login Successful")
-                self.errorLabel.isHidden = true
-            } else {
-                let userFriendlyError = self.processError(errorMessage)
-                self.errorLabel.text = userFriendlyError
-                self.errorLabel.isHidden = false
-            }
-        }
+        let loginModel = LoginModel(username: username, password: password)
+        viewModel.login(with: loginModel)
     }
 
     @objc private func forgotPasswordTapped() {
-            let recoveryVC = PasswordRecoveryViewController()
-            navigationController?.pushViewController(recoveryVC, animated: true)
-        }
-
-    @objc private func registerTapped() {
-        let recoveryVC = RegistrationViewController()
+        let recoveryVC = PasswordRecoveryViewController()
         navigationController?.pushViewController(recoveryVC, animated: true)
     }
 
-    private func processError(_ errorMessage: String?) -> String {
-        guard let message = errorMessage else {
-            return "Произошла ошибка, попробуйте ещё раз."
-        }
-        
-        if message.contains("The data couldn’t be read because it isn’t in the correct format") {
-            return "Произошла ошибка на сервере. Пожалуйста, попробуйте позже."
-        } else {
-            return "Неправильный логин или пароль"
-        }
+    @objc private func registerTapped() {
+        let registrationVC = RegistrationViewController()
+        navigationController?.pushViewController(registrationVC, animated: true)
     }
 }

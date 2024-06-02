@@ -100,6 +100,7 @@ class AppointmentViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .white
+        navigationController?.setNavigationBarHidden(false, animated: false) // Показываем навигационный бар
         setupLayout()
     }
     
@@ -191,6 +192,7 @@ class AppointmentViewController: UIViewController {
         let doctorsListVC = DoctorsListViewController()
         navigationController?.pushViewController(doctorsListVC, animated: true)
     }
+    
     
     @objc private func didTapServiceButton() {
         let servicesListVC = ServicesListViewController()

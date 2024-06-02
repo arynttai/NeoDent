@@ -111,6 +111,9 @@ class RegistrationViewController: UIViewController {
         let textField = UITextField()
         textField.placeholder = "Придумайте пароль"
         textField.borderStyle = .roundedRect
+        textField.isSecureTextEntry = true
+        textField.rightView = makeEyeButton()
+        textField.rightViewMode = .always
         return textField
     }()
     
@@ -126,6 +129,9 @@ class RegistrationViewController: UIViewController {
         let textField = UITextField()
         textField.placeholder = "Повторите пароль"
         textField.borderStyle = .roundedRect
+        textField.isSecureTextEntry = true
+        textField.rightView = makeEyeButton()
+        textField.rightViewMode = .always
         return textField
     }()
     
@@ -276,6 +282,16 @@ class RegistrationViewController: UIViewController {
         }
     }
     
+    private func makeEyeButton() -> UIButton {
+        let button = UIButton(type: .custom)
+        let eyeClosedImage = UIImage(systemName: "eye.slash")
+        let eyeOpenImage = UIImage(systemName: "eye")
+        button.setImage(eyeClosedImage, for: .normal)
+        button.setImage(eyeOpenImage, for: .selected)
+        button.addTarget(self, action: #selector(togglePasswordVisibility), for: .touchUpInside)
+        return button
+    }
+    
     private func addTextFieldTargets() {
         [firstNameTextField, lastNameTextField, usernameTextField, emailTextField, phoneNumberTextField, passwordTextField, confirmPasswordTextField].forEach { textField in
             textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
@@ -297,6 +313,15 @@ class RegistrationViewController: UIViewController {
             viewModel.updatePassword(textField.text ?? "")
         } else if textField == confirmPasswordTextField {
             viewModel.updateConfirmPassword(textField.text ?? "")
+        }
+    }
+    
+    @objc private func togglePasswordVisibility(_ sender: UIButton) {
+        sender.isSelected.toggle()
+        if sender == passwordTextField.rightView {
+            passwordTextField.isSecureTextEntry.toggle()
+        } else if sender == confirmPasswordTextField.rightView {
+            confirmPasswordTextField.isSecureTextEntry.toggle()
         }
     }
     
@@ -338,10 +363,17 @@ class RegistrationViewController: UIViewController {
             DispatchQueue.main.async {
                 if !success, let errorMessage = errorMessage {
                     self?.viewModel.errorMessage?(errorMessage)
+                } else {
+                    if let username = self?.usernameTextField.text {
+                        let mainTabBarController = MainTabBarController(username: username)
+                        mainTabBarController.modalPresentationStyle = .fullScreen
+                        self?.present(mainTabBarController, animated: true, completion: nil)
+                    }
                 }
             }
         }
     }
+
     
     @objc private func backTapped() {
         self.navigationController?.popViewController(animated: true)
