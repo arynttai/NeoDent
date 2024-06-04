@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6F6037FB2BFF1F240056B5B6 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 6F6037FA2BFF1F240056B5B6 /* Kingfisher */; };
 		6F6037FD2BFF24060056B5B6 /* CollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F6037FC2BFF24060056B5B6 /* CollectionViewCell.swift */; };
+		6F6328C22C0FBC0900C459B4 /* PersonalDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F6328C12C0FBC0900C459B4 /* PersonalDetailsViewController.swift */; };
 		6F67F0A22C07237E007E74CD /* MoreServicesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67F0A12C07237E007E74CD /* MoreServicesViewController.swift */; };
 		6F67F0A42C072394007E74CD /* MoreDoctorsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67F0A32C072394007E74CD /* MoreDoctorsViewController.swift */; };
 		6F67F0AB2C073D09007E74CD /* ServicesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F67F0AA2C073D09007E74CD /* ServicesListViewController.swift */; };
@@ -49,6 +50,7 @@
 
 /* Begin PBXFileReference section */
 		6F6037FC2BFF24060056B5B6 /* CollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewCell.swift; sourceTree = "<group>"; };
+		6F6328C12C0FBC0900C459B4 /* PersonalDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalDetailsViewController.swift; sourceTree = "<group>"; };
 		6F67F0A12C07237E007E74CD /* MoreServicesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreServicesViewController.swift; sourceTree = "<group>"; };
 		6F67F0A32C072394007E74CD /* MoreDoctorsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreDoctorsViewController.swift; sourceTree = "<group>"; };
 		6F67F0AA2C073D09007E74CD /* ServicesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesListViewController.swift; sourceTree = "<group>"; };
@@ -101,6 +103,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6F6328C02C0FBBF100C459B4 /* PersonalDetails */ = {
+			isa = PBXGroup;
+			children = (
+				6F6328C12C0FBC0900C459B4 /* PersonalDetailsViewController.swift */,
+			);
+			path = PersonalDetails;
+			sourceTree = "<group>";
+		};
 		6F67F0A62C073C51007E74CD /* DoctorsList */ = {
 			isa = PBXGroup;
 			children = (
@@ -251,6 +261,7 @@
 		6FC1B5282BFBAD740052A632 /* Appointment */ = {
 			isa = PBXGroup;
 			children = (
+				6F6328C02C0FBBF100C459B4 /* PersonalDetails */,
 				6F67F0A92C073CDE007E74CD /* Confirmation */,
 				6F67F0A82C073C99007E74CD /* Calendar */,
 				6F67F0A72C073C8F007E74CD /* ServicesList */,
@@ -418,6 +429,7 @@
 				6FC1B4812BF4E4D10052A632 /* VerificationView.swift in Sources */,
 				6FC1B5302BFBAE030052A632 /* AppointmentView.swift in Sources */,
 				6F67F0AF2C073D2B007E74CD /* CalendarViewController.swift in Sources */,
+				6F6328C22C0FBC0900C459B4 /* PersonalDetailsViewController.swift in Sources */,
 				6F67F0B12C073D39007E74CD /* ConfirmationViewController.swift in Sources */,
 				6F67F0AB2C073D09007E74CD /* ServicesListViewController.swift in Sources */,
 				6F67F0A22C07237E007E74CD /* MoreServicesViewController.swift in Sources */,

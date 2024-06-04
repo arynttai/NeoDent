@@ -170,21 +170,12 @@ class AppointmentViewController: UIViewController {
     
     @objc private func didTapContinueButton() {
         guard let doctor = selectedDoctor, let date = selectedDate, let time = selectedTime else { return }
-        let appointment = AppointmentDetail(
-            id: UUID().uuidString,
-            doctor: doctor,
-            service: Service(image: "Service Image"),
-            appointment_time: "\(date) \(time)",
-            patient_first_name: "First Name",
-            patient_last_name: "Last Name",
-            patient_phone_number: "1234567890",
-            address: "Address",
-            status: "Scheduled"
-        )
-        saveAppointment(appointment)
         
-        let confirmationVC = ConfirmationViewController()
-        navigationController?.pushViewController(confirmationVC, animated: true)
+        let detailsVC = PersonalDetailsViewController()
+        detailsVC.doctor = doctor
+        detailsVC.date = date
+        detailsVC.time = time
+        navigationController?.pushViewController(detailsVC, animated: true)
     }
     
     private func updateContinueButtonState() {
@@ -195,10 +186,6 @@ class AppointmentViewController: UIViewController {
             continueButton.isEnabled = false
             continueButton.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.5)
         }
-    }
-    
-    private func saveAppointment(_ appointment: AppointmentDetail) {
-        // Implement saving appointment to UserDefaults, database, or any persistent storage
     }
 }
 
