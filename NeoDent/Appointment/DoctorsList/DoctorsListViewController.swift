@@ -2,7 +2,13 @@ import UIKit
 import SnapKit
 import Kingfisher
 
+protocol DoctorsListViewControllerDelegate: AnyObject {
+    func didSelectDoctor(_ doctor: Doctor)
+}
+
 class DoctorsListViewController: UIViewController {
+    
+    weak var delegate: DoctorsListViewControllerDelegate?
     
     private var viewModel = MainViewModel()
     private var filteredDoctors: [Doctor] = []
@@ -159,6 +165,13 @@ extension DoctorsListViewController: UICollectionViewDelegate, UICollectionViewD
         }
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let doctor = isSearching ? filteredDoctors[indexPath.row] : viewModel.doctors[indexPath.row]
+        let doctorDetailVC = DoctorDetailViewController(doctor: doctor)
+        doctorDetailVC.delegate = self
+        navigationController?.pushViewController(doctorDetailVC, animated: true)
+    }
 }
 
 extension DoctorsListViewController: UISearchBarDelegate {
@@ -178,5 +191,16 @@ extension DoctorsListViewController: UISearchBarDelegate {
         searchBar.text = ""
         filteredDoctors = []
         collectionView.reloadData()
+    }
+}
+
+extension DoctorsListViewController: DoctorDetailViewControllerDelegate {
+    func didSelectDoctor(_ doctor: Doctor) {
+        if let index = viewModel.doctors.firstIndex(where: { $0.id == doctor.id }) {
+            viewModel.doctors[index] = doctor
+            collectionView.reloadData()
+        }
+        delegate?.didSelectDoctor(doctor)
+        navigationController?.popToViewController(delegate as! UIViewController, animated: true)
     }
 }

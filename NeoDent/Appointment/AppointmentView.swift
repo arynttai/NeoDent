@@ -35,31 +35,6 @@ class AppointmentViewController: UIViewController {
         return button
     }()
     
-    private let serviceLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Услуга"
-        label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .gray
-        return label
-    }()
-    
-    private let serviceButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Выберите услугу", for: .normal)
-        button.setTitleColor(.systemBlue, for: .normal)
-        button.contentHorizontalAlignment = .left
-        button.addTarget(self, action: #selector(didTapServiceButton), for: .touchUpInside)
-        return button
-    }()
-    
-    private let serviceArrow: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "chevron.right"), for: .normal)
-        button.tintColor = .gray
-        button.addTarget(self, action: #selector(didTapServiceButton), for: .touchUpInside)
-        return button
-    }()
-    
     private let dateTimeLabel: UILabel = {
         let label = UILabel()
         label.text = "Дата и время"
@@ -96,6 +71,15 @@ class AppointmentViewController: UIViewController {
         return button
     }()
     
+    private var selectedDoctor: Doctor? {
+        didSet {
+            guard let doctor = selectedDoctor else { return }
+            doctorButton.setTitle(doctor.fullName, for: .normal)
+            continueButton.isEnabled = true // Enable the button once a doctor is selected
+            continueButton.backgroundColor = .systemBlue // Change the button color to indicate it's enabled
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -110,26 +94,20 @@ class AppointmentViewController: UIViewController {
         view.addSubview(doctorLabel)
         view.addSubview(doctorButton)
         view.addSubview(doctorArrow)
-        
-        view.addSubview(serviceLabel)
-        view.addSubview(serviceButton)
-        view.addSubview(serviceArrow)
-        
         view.addSubview(dateTimeLabel)
         view.addSubview(dateTimeButton)
         view.addSubview(dateTimeArrow)
-        
         view.addSubview(continueButton)
         
         // Setup constraints
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(3)
-            make.leading.equalToSuperview().offset(16)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(16)
+            make.leading.trailing.equalToSuperview().inset(16)
         }
         
         doctorLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(32)
-            make.leading.equalToSuperview().offset(16)
+            make.leading.trailing.equalToSuperview().inset(16)
         }
         
         doctorButton.snp.makeConstraints { make in
@@ -145,27 +123,9 @@ class AppointmentViewController: UIViewController {
             make.width.height.equalTo(24)
         }
         
-        serviceLabel.snp.makeConstraints { make in
-            make.top.equalTo(doctorButton.snp.bottom).offset(16)
-            make.leading.equalToSuperview().offset(16)
-        }
-        
-        serviceButton.snp.makeConstraints { make in
-            make.top.equalTo(serviceLabel.snp.bottom).offset(8)
-            make.leading.equalToSuperview().offset(16)
-            make.trailing.equalTo(serviceArrow.snp.leading).offset(-8)
-            make.height.equalTo(44)
-        }
-        
-        serviceArrow.snp.makeConstraints { make in
-            make.centerY.equalTo(serviceButton)
-            make.trailing.equalToSuperview().offset(-16)
-            make.width.height.equalTo(24)
-        }
-        
         dateTimeLabel.snp.makeConstraints { make in
-            make.top.equalTo(serviceButton.snp.bottom).offset(16)
-            make.leading.equalToSuperview().offset(16)
+            make.top.equalTo(doctorButton.snp.bottom).offset(16)
+            make.leading.trailing.equalToSuperview().inset(16)
         }
         
         dateTimeButton.snp.makeConstraints { make in
@@ -190,13 +150,8 @@ class AppointmentViewController: UIViewController {
     
     @objc private func didTapDoctorButton() {
         let doctorsListVC = DoctorsListViewController()
+        doctorsListVC.delegate = self
         navigationController?.pushViewController(doctorsListVC, animated: true)
-    }
-    
-    
-    @objc private func didTapServiceButton() {
-        let servicesListVC = ServicesListViewController()
-        navigationController?.pushViewController(servicesListVC, animated: true)
     }
     
     @objc private func didTapDateTimeButton() {
@@ -207,5 +162,11 @@ class AppointmentViewController: UIViewController {
     @objc private func didTapContinueButton() {
         let confirmationVC = ConfirmationViewController()
         navigationController?.pushViewController(confirmationVC, animated: true)
+    }
+}
+
+extension AppointmentViewController: DoctorsListViewControllerDelegate {
+    func didSelectDoctor(_ doctor: Doctor) {
+        self.selectedDoctor = doctor
     }
 }
