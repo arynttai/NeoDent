@@ -1,6 +1,6 @@
 import Foundation
 
-struct Service {
+struct Service: Codable {
     let image: String
 }
 
@@ -50,4 +50,20 @@ struct DoctorsResponse: Codable {
         case totalPages = "total_pages"
         case list
     }
+}
+
+struct TimeSlot: Codable {
+    let time_slot: String
+}
+
+struct AppointmentDetail: Codable {
+    let id: String
+    let doctor: Doctor
+    let service: Service
+    let appointment_time: String
+    let patient_first_name: String
+    let patient_last_name: String
+    let patient_phone_number: String
+    let address: String
+    let status: String
 }

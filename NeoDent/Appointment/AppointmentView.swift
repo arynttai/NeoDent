@@ -66,7 +66,7 @@ class AppointmentViewController: UIViewController {
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.5)
         button.layer.cornerRadius = 10
-        button.isEnabled = false // Initially disabled
+        button.isEnabled = false
         button.addTarget(self, action: #selector(didTapContinueButton), for: .touchUpInside)
         return button
     }()
@@ -75,21 +75,22 @@ class AppointmentViewController: UIViewController {
         didSet {
             guard let doctor = selectedDoctor else { return }
             doctorButton.setTitle(doctor.fullName, for: .normal)
-            continueButton.isEnabled = true // Enable the button once a doctor is selected
-            continueButton.backgroundColor = .systemBlue // Change the button color to indicate it's enabled
+            updateContinueButtonState()
         }
     }
+    
+    private var selectedDate: Date?
+    private var selectedTime: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .white
-        navigationController?.setNavigationBarHidden(false, animated: false) // Показываем навигационный бар
+        navigationController?.setNavigationBarHidden(false, animated: false)
         setupLayout()
     }
     
     private func setupLayout() {
-        // Add subviews
         view.addSubview(titleLabel)
         view.addSubview(doctorLabel)
         view.addSubview(doctorButton)
@@ -99,7 +100,6 @@ class AppointmentViewController: UIViewController {
         view.addSubview(dateTimeArrow)
         view.addSubview(continueButton)
         
-        // Setup constraints
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
@@ -155,18 +155,64 @@ class AppointmentViewController: UIViewController {
     }
     
     @objc private func didTapDateTimeButton() {
+        guard let selectedDoctor = selectedDoctor else {
+            let alert = UIAlertController(title: "Ошибка", message: "Пожалуйста, выберите врача", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+            return
+        }
+        
         let calendarVC = CalendarViewController()
+        calendarVC.delegate = self
+        calendarVC.doctor = selectedDoctor
         navigationController?.pushViewController(calendarVC, animated: true)
     }
     
     @objc private func didTapContinueButton() {
+        guard let doctor = selectedDoctor, let date = selectedDate, let time = selectedTime else { return }
+        let appointment = AppointmentDetail(
+            id: UUID().uuidString,
+            doctor: doctor,
+            service: Service(image: "Service Image"),
+            appointment_time: "\(date) \(time)",
+            patient_first_name: "First Name",
+            patient_last_name: "Last Name",
+            patient_phone_number: "1234567890",
+            address: "Address",
+            status: "Scheduled"
+        )
+        saveAppointment(appointment)
+        
         let confirmationVC = ConfirmationViewController()
         navigationController?.pushViewController(confirmationVC, animated: true)
+    }
+    
+    private func updateContinueButtonState() {
+        if selectedDoctor != nil && selectedDate != nil && selectedTime != nil {
+            continueButton.isEnabled = true
+            continueButton.backgroundColor = .systemBlue
+        } else {
+            continueButton.isEnabled = false
+            continueButton.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.5)
+        }
+    }
+    
+    private func saveAppointment(_ appointment: AppointmentDetail) {
+        // Implement saving appointment to UserDefaults, database, or any persistent storage
     }
 }
 
 extension AppointmentViewController: DoctorsListViewControllerDelegate {
     func didSelectDoctor(_ doctor: Doctor) {
         self.selectedDoctor = doctor
+    }
+}
+
+extension AppointmentViewController: CalendarViewControllerDelegate {
+    func didSelectDate(_ date: Date, time: String) {
+        self.selectedDate = date
+        self.selectedTime = time
+        dateTimeButton.setTitle("\(date) \(time)", for: .normal)
+        updateContinueButtonState()
     }
 }
