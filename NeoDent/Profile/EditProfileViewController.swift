@@ -1,5 +1,6 @@
 import UIKit
 import Alamofire
+import SnapKit
 
 class EditProfileViewController: UIViewController {
     
@@ -110,6 +111,14 @@ class EditProfileViewController: UIViewController {
             switch response.result {
             case .success(let data):
                 print("Profile updated: \(data)")
+                if let navigationController = self.navigationController {
+                    for viewController in navigationController.viewControllers {
+                        if let profileVC = viewController as? ProfileViewController {
+                            profileVC.fetchProfileData()
+                            break
+                        }
+                    }
+                }
                 self.navigationController?.popViewController(animated: true)
             case .failure(let error):
                 print("Failed to update profile: \(error)")

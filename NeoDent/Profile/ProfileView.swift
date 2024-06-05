@@ -138,7 +138,7 @@ class ProfileViewController: UIViewController {
         }
     }
     
-    private func fetchProfileData() {
+    func fetchProfileData() {
         let url = "https://neobook.online/neodent/users/profile/"
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)"
@@ -155,6 +155,11 @@ class ProfileViewController: UIViewController {
                 print("Failed to fetch profile: \(error)")
             }
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchProfileData()
     }
     
     @objc private func loadAppointments() {
@@ -180,7 +185,9 @@ class ProfileViewController: UIViewController {
     }
     
     @objc private func didTapEditProfileButton() {
-        // Navigate to Edit Profile screen
+        let editProfileVC = EditProfileViewController()
+        editProfileVC.profile = profile
+        navigationController?.pushViewController(editProfileVC, animated: true)
     }
     
     @objc private func didTapLogoutButton() {
