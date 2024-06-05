@@ -7,7 +7,8 @@ class RegistrationViewModel {
     var errorMessage: ((String) -> Void)?
     var userFound: ((Int) -> Void)?
     var userCreated: ((Int) -> Void)?
-    
+    var accessToken: String?
+
     func updateFirstName(_ firstName: String) {
         user.first_name = firstName
         validateForm()
@@ -108,7 +109,8 @@ class RegistrationViewModel {
                                 }
                             }
                         } else if message == "User has successfully created" {
-                            if let userId = jsonResponse["user_id"] as? Int {
+                            if let userId = jsonResponse["user_id"] as? Int, let token = jsonResponse["access_token"] as? String {
+                                self.accessToken = token
                                 DispatchQueue.main.async {
                                     self.userCreated?(userId)
                                 }

@@ -2,7 +2,7 @@ import Foundation
 import Alamofire
 
 class LoginViewModel {
-    var onLoginSuccess: (() -> Void)?
+    var onLoginSuccess: ((String) -> Void)?
     var onLoginFailure: ((String) -> Void)?
 
     func login(with model: LoginModel) {
@@ -19,7 +19,7 @@ class LoginViewModel {
                 if let json = value as? [String: Any], let accessToken = json["access"] as? String, let refreshToken = json["refresh"] as? String {
                     print("Access token: \(accessToken)")
                     self.saveTokens(accessToken: accessToken, refreshToken: refreshToken)
-                    self.onLoginSuccess?()
+                    self.onLoginSuccess?(accessToken)
                 } else if let json = value as? [String: Any], let detail = json["detail"] as? String {
                     self.onLoginFailure?(detail)
                 } else {

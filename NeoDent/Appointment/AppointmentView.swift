@@ -1,4 +1,5 @@
 import UIKit
+import Alamofire
 import SnapKit
 
 class AppointmentViewController: UIViewController {
@@ -81,7 +82,17 @@ class AppointmentViewController: UIViewController {
     
     private var selectedDate: Date?
     private var selectedTime: String?
-    
+    private var accessToken: String
+
+    init(accessToken: String) {
+        self.accessToken = accessToken
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -162,20 +173,15 @@ class AppointmentViewController: UIViewController {
             return
         }
         
-        let calendarVC = CalendarViewController()
+        let calendarVC = CalendarViewController(doctor: selectedDoctor, accessToken: accessToken)
         calendarVC.delegate = self
-        calendarVC.doctor = selectedDoctor
         navigationController?.pushViewController(calendarVC, animated: true)
     }
     
     @objc private func didTapContinueButton() {
         guard let doctor = selectedDoctor, let date = selectedDate, let time = selectedTime else { return }
-        
-        let detailsVC = PersonalDetailsViewController()
-        detailsVC.doctor = doctor
-        detailsVC.date = date
-        detailsVC.time = time
-        navigationController?.pushViewController(detailsVC, animated: true)
+        let personalDetailsVC = PersonalDetailsViewController(doctor: doctor, date: date, time: time, accessToken: accessToken)
+        navigationController?.pushViewController(personalDetailsVC, animated: true)
     }
     
     private func updateContinueButtonState() {

@@ -67,3 +67,24 @@ struct AppointmentDetail: Codable {
     let address: String
     let status: String
 }
+
+struct Profile: Codable {
+    let id: Int
+    let username: String
+    let email: String?
+    let firstName: String?
+    let lastName: String?
+    let phoneNumber: String?
+    let appointments: [AppointmentDetail]?
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case username
+        case email
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case phoneNumber = "phone_number"
+        case appointments
+    }
+}
+

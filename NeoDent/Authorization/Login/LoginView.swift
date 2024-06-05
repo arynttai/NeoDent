@@ -183,15 +183,12 @@ class LoginViewController: UIViewController {
     }
 
     private func setupBindings() {
-        viewModel.onLoginSuccess = { [weak self] in
+        viewModel.onLoginSuccess = { [weak self] accessToken in
             guard let self = self else { return }
             self.errorLabel.isHidden = true
-            // Navigate to MainTabBarController or perform other actions
-            if let username = self.usernameTextField.text {
-                let mainTabBarController = MainTabBarController(username: username)
-                mainTabBarController.modalPresentationStyle = .fullScreen
-                self.navigationController?.setViewControllers([mainTabBarController], animated: true)
-            }
+            let mainTabBarController = MainTabBarController(username: self.usernameTextField.text ?? "", accessToken: accessToken)
+            mainTabBarController.modalPresentationStyle = .fullScreen
+            self.present(mainTabBarController, animated: true, completion: nil)
         }
         
         viewModel.onLoginFailure = { [weak self] errorMessage in

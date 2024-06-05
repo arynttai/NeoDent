@@ -10,9 +10,18 @@ class CalendarViewController: UIViewController {
     
     weak var delegate: CalendarViewControllerDelegate?
     
-    var doctor: Doctor? // Установите текущего выбранного врача
-    var accessToken: String? = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE3NTM3Nzg1LCJpYXQiOjE3MTc1MzQxODUsImp0aSI6ImIxYTMyMGUyMGQ0NDQxMDliOGFlZWM3ODBhNDVmMzRhIiwidXNlcl9pZCI6NDd9.EaWmScVI9qUqcxoZOk952h16Uo1xigHKFLxha8ghYRk" // Установите токен доступа
+    var doctor: Doctor?
+    var accessToken: String? = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE3NTM3Nzg1LCJpYXQiOjE3MTc1MzQxODUsImp0aSI6ImIxYTMyMGUyMGQ0NDQxMDliOGFlZWM3ODBhNDVmMzRhIiwidXNlcl9pZCI6NDd9.EaWmScVI9qUqcxoZOk952h16Uo1xigHKFLxha8ghYRk"
+    init(doctor: Doctor, accessToken: String?) {
+        self.doctor = doctor
+        self.accessToken = accessToken
+        super.init(nibName: nil, bundle: nil)
+    }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Выберите дату и время"
@@ -48,7 +57,7 @@ class CalendarViewController: UIViewController {
         button.layer.cornerRadius = 10
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         button.addTarget(self, action: #selector(didTapContinueButton), for: .touchUpInside)
-        button.isEnabled = false // Изначально кнопка отключена
+        button.isEnabled = false
         return button
     }()
     
@@ -68,10 +77,6 @@ class CalendarViewController: UIViewController {
         view.backgroundColor = .white
         setupUI()
         calendar.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
-        
-        // Пример инициализации доктора
-        let exampleDoctor = Doctor(id: 1, fullName: "Доктор Иванов", specialization: Specialization(id: 1, name: "Терапевт"), workExperience: 10, rating: 4.5, workDays: ["monday", "wednesday", "friday"], startWorkTime: "09:00", endWorkTime: "17:00", image: Image(id: 1, file: "example.jpg"), isFavorite: true)
-        doctor = exampleDoctor
     }
     
     private func setupUI() {
@@ -143,8 +148,40 @@ class CalendarViewController: UIViewController {
                     self.showError("Врач не работает в выбранную дату.")
                 }
             case .failure(let error):
-                print("Ошибка при получении временных слотов: \(error)")
-                self.showError("Ошибка при получении временных слотов.")
+                if let statusCode = response.response?.statusCode, statusCode == 401 {
+                    self.refreshAccessToken {
+                        self.fetchTimeSlots(for: date)
+                    }
+                } else {
+                    print("Ошибка при получении временных слотов: \(error)")
+                    self.showError("Ошибка при получении временных слотов.")
+                }
+            }
+        }
+    }
+    
+    private func refreshAccessToken(completion: @escaping () -> Void) {
+        guard let refreshToken = UserDefaults.standard.string(forKey: "refreshToken") else {
+            print("No refresh token found")
+            return
+        }
+        
+        let url = "https://neobook.online/neodent/users/login/refresh/"
+        let parameters: [String: Any] = [
+            "refresh": refreshToken
+        ]
+        
+        AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default).responseJSON { response in
+            switch response.result {
+            case .success(let data):
+                if let json = data as? [String: Any], let newAccessToken = json["access"] as? String {
+                    UserDefaults.standard.set(newAccessToken, forKey: "accessToken")
+                    completion()
+                } else {
+                    print("Failed to refresh token: \(data)")
+                }
+            case .failure(let error):
+                print("Error refreshing token: \(error)")
             }
         }
     }
@@ -165,37 +202,8 @@ class CalendarViewController: UIViewController {
         }
     }
     
-    private func showError(_ message: String) {
-        errorLabel.text = message
-        errorLabel.isHidden = false
-        continueButton.isEnabled = false // Отключаем кнопку "Далее"
-        timeSlots.removeAll()
-        updateTimeSlotButtons()
-    }
-    
-    private func isDoctorAvailable(on date: Date) -> Bool {
-        guard let doctor = doctor else { return false }
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: date)
-        
-        let workDays = doctor.workDays.map { $0.lowercased() }
-        let daySymbols = calendar.weekdaySymbols.map { $0.lowercased() }
-        
-        if weekday - 1 < daySymbols.count {
-            let selectedDay = daySymbols[weekday - 1]
-            return workDays.contains(selectedDay)
-        }
-        
-        return false
-    }
-    
     @objc private func dateChanged(_ sender: UIDatePicker) {
-        let selectedDate = sender.date
-        if isDoctorAvailable(on: selectedDate) {
-            fetchTimeSlots(for: selectedDate)
-        } else {
-            showError("Врач не работает в выбранную дату.")
-        }
+        fetchTimeSlots(for: sender.date)
     }
     
     @objc private func didSelectTimeSlot(_ sender: UIButton) {
@@ -219,5 +227,13 @@ class CalendarViewController: UIViewController {
         
         delegate?.didSelectDate(selectedDate, time: selectedTime)
         navigationController?.popViewController(animated: true)
+    }
+    
+    private func showError(_ message: String) {
+        errorLabel.text = message
+        errorLabel.isHidden = false
+        continueButton.isEnabled = false
+        timeSlots.removeAll()
+        updateTimeSlotButtons()
     }
 }

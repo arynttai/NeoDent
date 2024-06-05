@@ -364,8 +364,8 @@ class RegistrationViewController: UIViewController {
                 if !success, let errorMessage = errorMessage {
                     self?.viewModel.errorMessage?(errorMessage)
                 } else {
-                    if let username = self?.usernameTextField.text {
-                        let mainTabBarController = MainTabBarController(username: username)
+                    if let username = self?.usernameTextField.text, let accessToken = self?.viewModel.accessToken {
+                        let mainTabBarController = MainTabBarController(username: username, accessToken: accessToken)
                         mainTabBarController.modalPresentationStyle = .fullScreen
                         self?.present(mainTabBarController, animated: true, completion: nil)
                     }

@@ -1,4 +1,5 @@
 import UIKit
+import Alamofire
 import SnapKit
 
 class PersonalDetailsViewController: UIViewController {
@@ -6,7 +7,20 @@ class PersonalDetailsViewController: UIViewController {
     var doctor: Doctor?
     var date: Date?
     var time: String?
+    private var accessToken: String?
+
+    init(doctor: Doctor, date: Date, time: String, accessToken: String?) {
+        self.doctor = doctor
+        self.date = date
+        self.time = time
+        self.accessToken = accessToken
+        super.init(nibName: nil, bundle: nil)
+    }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Введите ваши данные"
@@ -94,12 +108,46 @@ class PersonalDetailsViewController: UIViewController {
         guard let firstName = firstNameTextField.text, !firstName.isEmpty,
               let lastName = lastNameTextField.text, !lastName.isEmpty,
               let phone = phoneTextField.text, !phone.isEmpty,
-              let doctor = doctor, let date = date, let time = time else {
+              let doctor = doctor, let date = date, let time = time, let token = accessToken else {
             let alert = UIAlertController(title: "Ошибка", message: "Пожалуйста, заполните все поля", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             present(alert, animated: true, completion: nil)
             return
         }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: date)
+        
+        let url = "https://neobook.online/neodent/appointments/"
+        let parameters: [String: Any] = [
+            "doctor_id": doctor.id,
+            "date": dateString,
+            "time": time,
+            "first_name": firstName,
+            "last_name": lastName,
+            "phone": phone
+        ]
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(token)"
+        ]
+        
+        AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+            switch response.result {
+            case .success(let data):
+                print("Server response: \(data)")
+                self.saveAppointment(firstName: firstName, lastName: lastName, phone: phone)
+            case .failure(let error):
+                print("Ошибка при записи: \(error)")
+                let alert = UIAlertController(title: "Ошибка", message: "Ошибка при записи на прием", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    private func saveAppointment(firstName: String, lastName: String, phone: String) {
+        guard let doctor = doctor, let date = date, let time = time else { return }
         
         let appointment = AppointmentDetail(
             id: UUID().uuidString,
@@ -112,14 +160,6 @@ class PersonalDetailsViewController: UIViewController {
             address: "Address",
             status: "Scheduled"
         )
-        saveAppointment(appointment)
-        
-        let confirmationVC = ConfirmationViewController()
-        navigationController?.pushViewController(confirmationVC, animated: true)
-    }
-    
-    private func saveAppointment(_ appointment: AppointmentDetail) {
-        // Implement saving appointment to UserDefaults, database, or any persistent storage
         
         var appointments = UserDefaults.standard.array(forKey: "appointments") as? [[String: Any]] ?? []
         
@@ -137,5 +177,14 @@ class PersonalDetailsViewController: UIViewController {
         
         appointments.append(appointmentDict)
         UserDefaults.standard.set(appointments, forKey: "appointments")
+        
+        NotificationCenter.default.post(name: .appointmentSavedNotification, object: nil)
+        
+        let confirmationVC = ConfirmationViewController()
+        navigationController?.pushViewController(confirmationVC, animated: true)
     }
+}
+
+extension NSNotification.Name {
+    static let appointmentSavedNotification = NSNotification.Name("appointmentSavedNotification")
 }
