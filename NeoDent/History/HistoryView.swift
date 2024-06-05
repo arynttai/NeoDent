@@ -31,6 +31,9 @@ class HistoryViewController: UIViewController {
         tableView.dataSource = self
         
         loadAppointments()
+        
+        // Add observer for appointment cancellation notification
+        NotificationCenter.default.addObserver(self, selector: #selector(handleAppointmentCancelledNotification(_:)), name: .appointmentCancelledNotification, object: nil)
     }
     
     private func loadAppointments() {
@@ -52,6 +55,31 @@ class HistoryViewController: UIViewController {
                 return AppointmentDetail(id: id, doctor: doctor, service: service, appointment_time: appointmentTime, patient_first_name: firstName, patient_last_name: lastName, patient_phone_number: phoneNumber, address: address, status: status)
             }
             tableView.reloadData()
+        }
+    }
+    
+    @objc private func handleAppointmentCancelledNotification(_ notification: Notification) {
+        if let appointment = notification.object as? AppointmentDetail {
+            if let index = appointments.firstIndex(where: { $0.id == appointment.id }) {
+                appointments.remove(at: index)
+                tableView.reloadData()
+                
+                // Update UserDefaults
+                let appointmentDicts = appointments.map { appointment in
+                    return [
+                        "id": appointment.id,
+                        "doctor": appointment.doctor.fullName,
+                        "service": appointment.service.image,
+                        "appointment_time": appointment.appointment_time,
+                        "patient_first_name": appointment.patient_first_name,
+                        "patient_last_name": appointment.patient_last_name,
+                        "patient_phone_number": appointment.patient_phone_number,
+                        "address": appointment.address,
+                        "status": appointment.status
+                    ] as [String : Any]
+                }
+                UserDefaults.standard.setValue(appointmentDicts, forKey: "appointments")
+            }
         }
     }
 }

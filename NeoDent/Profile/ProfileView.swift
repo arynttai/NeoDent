@@ -201,14 +201,51 @@ extension ProfileViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         let appointment = appointments[indexPath.row]
-        cell.configure(with: appointment)
+        cell.configure(with: appointment, accessToken: accessToken)
+        cell.delegate = self
         return cell
     }
+}
+
+extension ProfileViewController: AppointmentCellDelegate {
+    func didCancelAppointment(_ appointment: AppointmentDetail) {
+        // Update local data and reload the table view
+        if let index = appointments.firstIndex(where: { $0.id == appointment.id }) {
+            appointments.remove(at: index)
+            appointmentsTableView.reloadData()
+            
+            // Update UserDefaults
+            let appointmentDicts = appointments.map { appointment in
+                return [
+                    "id": appointment.id,
+                    "doctor": appointment.doctor.fullName,
+                    "service": appointment.service.image,
+                    "appointment_time": appointment.appointment_time,
+                    "patient_first_name": appointment.patient_first_name,
+                    "patient_last_name": appointment.patient_last_name,
+                    "patient_phone_number": appointment.patient_phone_number,
+                    "address": appointment.address,
+                    "status": appointment.status
+                ] as [String : Any]
+            }
+            UserDefaults.standard.setValue(appointmentDicts, forKey: "appointments")
+            
+            // Post a notification about the cancellation
+            NotificationCenter.default.post(name: .appointmentCancelledNotification, object: appointment)
+        }
+    }
+}
+
+protocol AppointmentCellDelegate: AnyObject {
+    func didCancelAppointment(_ appointment: AppointmentDetail)
 }
 
 class AppointmentCell: UITableViewCell {
     
     static let identifier = "AppointmentCell"
+    weak var delegate: AppointmentCellDelegate?
+    private var appointment: AppointmentDetail?
+    private var accessToken: String?
     
     private let doctorNameLabel: UILabel = {
         let label = UILabel()
@@ -284,7 +321,9 @@ class AppointmentCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(with appointment: AppointmentDetail) {
+    func configure(with appointment: AppointmentDetail, accessToken: String) {
+        self.appointment = appointment
+        self.accessToken = accessToken
         doctorNameLabel.text = appointment.doctor.fullName
         serviceLabel.text = appointment.service.image
         dateTimeLabel.text = appointment.appointment_time
@@ -292,7 +331,24 @@ class AppointmentCell: UITableViewCell {
     }
     
     @objc private func didTapCancelButton() {
-        // Implement cancel appointment functionality
+        guard let appointment = appointment, let accessToken = accessToken else { return }
+        
+        let url = "https://neobook.online/neodent/appointments/\(appointment.id)/cancel"
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)"
+        ]
+        
+        AF.request(url, method: .post, headers: headers).response { response in
+            switch response.result {
+            case .success:
+                self.delegate?.didCancelAppointment(appointment)
+            case .failure(let error):
+                print("Failed to cancel appointment: \(error)")
+            }
+        }
     }
 }
 
+extension Notification.Name {
+    static let appointmentCancelledNotification = Notification.Name("appointmentCancelledNotification")
+}
